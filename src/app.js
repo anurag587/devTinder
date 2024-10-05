@@ -1,28 +1,35 @@
 const express = require("express");
-
+const connectDb = require("./config/database.js");
 const app = express();
 
-//this is known as request handlers and the order of req handlers are very important 
-app.get("/user",(req,res)=>{
-    res.send({
+const User = require("./models/user");
+
+app.post("/signup", async (req,res)=>{
+    const user = new User({
         firstName : "Anurag",
-        lastName : "Sharma"
-    });
- });
-
- app.post("/user",(req,res)=>{
-    res.send("Saving the Data to DB");
- });
-
- app.delete("/user",(req,res)=>{
-    res.send("Deleting the Data from DB");
- });
-
-app.use("/test",(req,res)=>{
-   res.send("testing the api calls");
-});
-
-
-app.listen(3000,()=>{
-    console.log("Server Started")
+        lastName : "Sharma",
+        emailId : "anuragusict09@gmail.com",
+        password : "anurag@1230",
+        age: 24,
+        gender : "male"
+    })
+    try{
+        await user.save();
+    res.send("User Data Saved")
+    }
+    catch(err){
+        res.status(400).send("Data not Saved")
+    }
 })
+
+
+connectDb()
+  .then(() => {
+    console.log("DataBase Successfully Connected");
+    app.listen(3000, () => {
+      console.log("Server Started");
+    });
+  })
+  .catch((err) => {
+    console.log("Database not connected");
+  });
