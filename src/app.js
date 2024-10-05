@@ -29,7 +29,6 @@ app.get("/feed", async (req,res)=>{
     }
 })
 
-
 app.post("/signup", async (req, res) => {
   const user = new User(req.body);
   try {
@@ -39,6 +38,18 @@ app.post("/signup", async (req, res) => {
     res.status(400).send("Data not Saved");
   }
 });
+
+app.delete("/user", async (req,res)=>{
+    const userId = req.body.userId;
+    try{
+       // console.log(userId)
+         await User.findByIdAndDelete(userId);
+        res.send("User Deleted")
+    }
+    catch (err) {
+        res.status(400).send("Data not Saved");
+      }
+})
 
 connectDb()
   .then(() => {
