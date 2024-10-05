@@ -4,30 +4,27 @@ const app = express();
 
 const User = require("./models/user");
 
-
 app.use(express.json());
 
 //Get User from email
-app.get("/user",async (req,res)=>{
-    const user = await User.findOne({emailId : req.body.emailId});
-    try{
-        res.send(user);
-    }
-    catch(err){
-        res.status(400).send("Something went Wrong")
-    }
-})
+app.get("/user", async (req, res) => {
+  const user = await User.findOne({ emailId: req.body.emailId });
+  try {
+    res.send(user);
+  } catch (err) {
+    res.status(400).send("Something went Wrong");
+  }
+});
 
-//Feed API --> To get all users from DB 
-app.get("/feed", async (req,res)=>{
-    const users = await User.find({});
-    try{
-        res.send(users)
-    }
-    catch(err){
-        res.status(400).send("Something went Wrong")
-    }
-})
+//Feed API --> To get all users from DB
+app.get("/feed", async (req, res) => {
+  const users = await User.find({});
+  try {
+    res.send(users);
+  } catch (err) {
+    res.status(400).send("Something went Wrong");
+  }
+});
 
 app.post("/signup", async (req, res) => {
   const user = new User(req.body);
@@ -39,29 +36,29 @@ app.post("/signup", async (req, res) => {
   }
 });
 
-app.delete("/user", async (req,res)=>{
-    const userId = req.body.userId;
-    try{
-       // console.log(userId)
-         await User.findByIdAndDelete(userId);
-        res.send("User Deleted")
-    }
-    catch (err) {
-        res.status(400).send("Data not Saved");
-      }
-})
+app.delete("/user", async (req, res) => {
+  const userId = req.body.userId;
+  try {
+    // console.log(userId)
+    await User.findByIdAndDelete(userId);
+    res.send("User Deleted");
+  } catch (err) {
+    res.status(400).send("Data not Saved");
+  }
+});
 
-app.patch("/user", async (req,res)=>{
-    const userId = req.body.userId;
-    const data = req.body;
-    try{
-        await User.findByIdAndUpdate({_id : userId}, data)
-        res.send("Updated Successfully")
-    }
-    catch(err){
-        res.status(400).send("Data not Saved");
-    }
-})
+app.patch("/user", async (req, res) => {
+  const userId = req.body.userId;
+  const data = req.body;
+  try {
+    await User.findByIdAndUpdate({ _id: userId }, data, {
+      runValidators: true,
+    });
+    res.send("Updated Successfully");
+  } catch (err) {
+    res.status(400).send("Data not Updated");
+  }
+});
 connectDb()
   .then(() => {
     console.log("DataBase Successfully Connected");
