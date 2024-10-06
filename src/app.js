@@ -28,11 +28,27 @@ app.get("/feed", async (req, res) => {
 
 app.post("/signup", async (req, res) => {
   const user = new User(req.body);
+  const data = req.body;
   try {
+    const userData = [
+      "firstName",
+      "lastName",
+      "emailId",
+      "password",
+      "about",
+      "gender",
+      "skills",
+      "photoUrl",
+      "age",
+    ];
+    const dataAllowed = Object.keys(data).every((k) => userData.includes(k));
+    if (!dataAllowed) {
+      throw new Error("Must fill only field shown on the UI");
+    }
     await user.save();
     res.send("User Data Saved");
   } catch (err) {
-    res.status(400).send("Data not Saved");
+    res.status(400).send("Data not Saved" + err.message);
   }
 });
 
@@ -47,16 +63,30 @@ app.delete("/user", async (req, res) => {
   }
 });
 
-app.patch("/user", async (req, res) => {
-  const userId = req.body.userId;
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params.userId;
   const data = req.body;
   try {
+    const ALLOWED_UPDATES = [
+      "photoUrl",
+      "gender",
+      "about",
+      "age",
+      "skills",
+      "userId",
+    ];
+    const isUpdateAllowed = Object.keys(data).every((k) =>
+      ALLOWED_UPDATES.includes(k)
+    );
+    if (!isUpdateAllowed) {
+      throw new Error("These are not allowed to update");
+    }
     await User.findByIdAndUpdate({ _id: userId }, data, {
       runValidators: true,
     });
     res.send("Updated Successfully");
   } catch (err) {
-    res.status(400).send("Data not Updated");
+    res.status(400).send("Data not Updated" + err.message);
   }
 });
 connectDb()
