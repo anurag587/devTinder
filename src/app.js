@@ -30,7 +30,7 @@ app.get("/feed", async (req, res) => {
 app.post("/signup", async (req, res) => {
   try {
     //Validation of User
-    
+
     validatingSignUpUser(req);
     const { firstName, lastName, emailId, password } = req.body;
 
@@ -47,7 +47,24 @@ app.post("/signup", async (req, res) => {
     await user.save();
     res.send("User Data Saved");
   } catch (err) {
-    console.log(err.message);
+    res.status(400).send("ERROR : " + err.message);
+  }
+});
+
+app.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+
+    const user = await User.findOne({ emailId: emailId });
+    if (!user) {
+      throw new Error("Invalid Credentials");
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new Error("Invalid Credentials");
+    }
+    res.send("LogIn Successfully!!!");
+  } catch (err) {
     res.status(400).send("ERROR : " + err.message);
   }
 });
