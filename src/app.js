@@ -1,7 +1,8 @@
 const express = require("express");
 const connectDb = require("./config/database.js");
 const app = express();
-
+const { validatingSignUpUser } = require("./utils/validation.js");
+const bcrypt = require("bcrypt");
 const User = require("./models/user");
 
 app.use(express.json());
@@ -27,28 +28,27 @@ app.get("/feed", async (req, res) => {
 });
 
 app.post("/signup", async (req, res) => {
-  const user = new User(req.body);
-  const data = req.body;
   try {
-    const userData = [
-      "firstName",
-      "lastName",
-      "emailId",
-      "password",
-      "about",
-      "gender",
-      "skills",
-      "photoUrl",
-      "age",
-    ];
-    const dataAllowed = Object.keys(data).every((k) => userData.includes(k));
-    if (!dataAllowed) {
-      throw new Error("Must fill only field shown on the UI");
-    }
+    //Validation of User
+    
+    validatingSignUpUser(req);
+    const { firstName, lastName, emailId, password } = req.body;
+
+    //Encrypting the Password
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    //Creating an Instance of the user
+    const user = new User({
+      firstName,
+      lastName,
+      emailId,
+      password: passwordHash,
+    });
     await user.save();
     res.send("User Data Saved");
   } catch (err) {
-    res.status(400).send("Data not Saved" + err.message);
+    console.log(err.message);
+    res.status(400).send("ERROR : " + err.message);
   }
 });
 
