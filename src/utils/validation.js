@@ -10,4 +10,24 @@ const validatingSignUpUser = (req) => {
     throw new Error("Please enter Strong Password");
   }
 };
-module.exports = { validatingSignUpUser };
+
+const validatingEditProfile = (req) => {
+  try {
+    const ALLOWED_EDITS = [
+      "firstnName",
+      "lastName",
+      "about",
+      "gender",
+      "age",
+      "skills",
+    ];
+
+    const isEditableItems = Object.keys(req.body).every((fields) =>
+      ALLOWED_EDITS.includes(fields)
+    );
+    return isEditableItems;
+  } catch (err) {
+    res.status(400).send("Invalid Edit Fields");
+  }
+};
+module.exports = { validatingSignUpUser, validatingEditProfile };
