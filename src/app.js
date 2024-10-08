@@ -59,7 +59,7 @@ app.post("/login", async (req, res) => {
     //Creating JWT Token
     else {
       const token = await jwt.sign({ _id: user.id }, "secret_key", {
-        expiresIn: "1d", //tells us in how much time token should expire 
+        expiresIn: "1d", //tells us in how much time token should expire
       });
       //Add token to cookie and send back to user
       res.cookie("token", token);
@@ -69,6 +69,16 @@ app.post("/login", async (req, res) => {
     res.status(400).send("ERROR : " + err.message);
   }
 });
+
+app.post("/sendConnectionRequest", userAuth, (req, res) => {
+  try {
+    const user = req.user;
+    res.send("Sent Connection successfully from "+  user.firstName);
+  } catch (err) {
+    res.status(400).send("ERROR : " + err.message);
+  }
+});
+
 connectDb()
   .then(() => {
     console.log("DataBase Successfully Connected");
