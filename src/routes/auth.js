@@ -56,5 +56,13 @@ authRouter.post("/login", async (req, res) => {
   }
 });
 
+authRouter.post("/logout", (req, res) => {
+    //Just Deleting the cookies from the client browser and the user will automatically logout
+  res
+    .cookie("token", null, {
+      expires: new Date(Date.now()),
+    })
+    .send("Logout Successfull!!");
+});
 
 module.exports = authRouter;
