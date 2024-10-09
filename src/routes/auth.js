@@ -57,7 +57,7 @@ authRouter.post("/login", async (req, res) => {
 });
 
 authRouter.post("/logout", (req, res) => {
-    //Just Deleting the cookies from the client browser and the user will automatically logout
+  //Just Deleting the cookies from the client browser and the user will automatically logout
   res
     .cookie("token", null, {
       expires: new Date(Date.now()),
@@ -65,4 +65,26 @@ authRouter.post("/logout", (req, res) => {
     .send("Logout Successfull!!");
 });
 
+authRouter.patch("/resetPassword", async (req, res) => {
+  try {
+    const { emailId, newPassword } = req.body;
+
+    const currentUser = await User.find({ emailId });
+    console.log(currentUser);
+
+    if (!currentUser) {
+      res.status(400).send("Invalid Credentials");
+    }
+    const newHashPassword = await bcrypt.hash(newPassword, 10);
+
+    currentUser.password = newHashPassword;
+    console.log(currentUser.password);
+    await User.updateOne({ emailId }, { password: newHashPassword });
+    //console.log("hello");
+
+    res.send("Password Successfully Updated");
+  } catch (err) {
+    res.status(400).send("Error in Reseting Password " + err);
+  }
+});
 module.exports = authRouter;
